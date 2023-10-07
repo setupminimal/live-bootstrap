@@ -16,6 +16,7 @@ you can run bootstap inside chroot.
 import argparse
 import os
 import shutil
+import subprocess
 
 from sysa import SysA
 from sysc import SysC
@@ -254,6 +255,9 @@ print(shutil.which('chroot'))
                 '-append', 'console=ttyS0')
         else:
             system_a.prepare(create_initramfs=True, kernel_bootstrap=True)
+
+            local_cache = subprocess.Popen(['python', '-m', 'http.server'], cwd='sysc/distfiles')
+
             run(args.qemu_cmd,
                 '-enable-kvm',
                 '-m', "4G",
@@ -263,6 +267,9 @@ print(shutil.which('chroot'))
                 '-machine', 'kernel-irqchip=split',
                 '-nic', 'user,ipv6=off,model=e1000',
                 '-nographic')
+
+            local_cache.terminate()
+            local_cache.wait(10)
 
 if __name__ == "__main__":
     main()

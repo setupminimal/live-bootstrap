@@ -207,6 +207,11 @@ interpret_source_line() {
     fname="${3}"
     # Default to basename of url if not given
     fname="${fname:-$(basename "${url}")}"
+    # Try to get the file from the host
+    if ! [ -e "${fname}" ]; then
+        curl --fail --location "http://10.0.2.2:8000/${fname}" --output "${fname}" || true
+    fi
+    # Fetch the file from the original location
     if ! [ -e "${fname}" ]; then
         curl --fail --location "${url}" --output "${fname}"
     fi
